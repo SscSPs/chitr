@@ -3,6 +3,7 @@ import 'package:chitr/image/ui/image_page.dart';
 import 'package:chitr/search/searchPage.dart';
 import 'package:chitr/util/api_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:preload_page_view/preload_page_view.dart';
 
 import 'custom_card.dart';
@@ -15,16 +16,23 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   List<PreloadPageController> controllers = [];
   List<Hits> hits;
+  var viewPortFractions = 0.7;
+  var initialOffset = 2;
 
   @override
   void initState() {
     _loadImages();
     controllers = [
-      PreloadPageController(viewportFraction: 0.6, initialPage: 3),
-      PreloadPageController(viewportFraction: 0.6, initialPage: 3),
-      PreloadPageController(viewportFraction: 0.6, initialPage: 3),
-      PreloadPageController(viewportFraction: 0.6, initialPage: 3),
-      PreloadPageController(viewportFraction: 0.6, initialPage: 3),
+      PreloadPageController(
+          viewportFraction: viewPortFractions, initialPage: initialOffset),
+      PreloadPageController(
+          viewportFraction: viewPortFractions, initialPage: initialOffset),
+      PreloadPageController(
+          viewportFraction: viewPortFractions, initialPage: initialOffset),
+      PreloadPageController(
+          viewportFraction: viewPortFractions, initialPage: initialOffset),
+      PreloadPageController(
+          viewportFraction: viewPortFractions, initialPage: initialOffset),
     ];
     super.initState();
   }
@@ -50,16 +58,17 @@ class _HomePageState extends State<HomePage> {
       extendBody: true,
       backgroundColor: Theme.of(context).backgroundColor,
       body: PreloadPageView.builder(
-        controller:
-            PreloadPageController(viewportFraction: 0.7, initialPage: 3),
+        controller: PreloadPageController(
+            viewportFraction: viewPortFractions, initialPage: initialOffset),
         itemCount: 5,
         preloadPagesCount: 5,
+        scrollDirection: Axis.vertical,
         itemBuilder: (context, mainIndex) {
           return PreloadPageView.builder(
             itemCount: 5,
             preloadPagesCount: 5,
             controller: controllers[mainIndex],
-            scrollDirection: Axis.vertical,
+            scrollDirection: Axis.horizontal,
             physics: ClampingScrollPhysics(),
             onPageChanged: (page) {
               _animatePage(page, mainIndex);
@@ -77,6 +86,7 @@ class _HomePageState extends State<HomePage> {
                       context,
                       MaterialPageRoute(
                         builder: (context) => ImagePage(
+                          heroTag: hitIndex.toString(),
                           model: hit,
                           imageBoxFit: BoxFit.cover,
                         ),
@@ -85,6 +95,7 @@ class _HomePageState extends State<HomePage> {
                   }
                 },
                 child: CustomCard(
+                  heroTag: hitIndex.toString(),
                   title: hit?.user,
                   description: hit?.tags,
                   url: hit?.webformatURL,
@@ -94,13 +105,27 @@ class _HomePageState extends State<HomePage> {
           );
         },
       ),
-      floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.search),
-        onPressed: () {
-          Navigator.push(
-              context, MaterialPageRoute(builder: (context) => SearchPage()));
-        },
-      ),
+      floatingActionButton:
+          Row(mainAxisAlignment: MainAxisAlignment.end, children: <Widget>[
+        Padding(
+          child: FloatingActionButton(
+            heroTag: "searchFAB",
+            child: Icon(Icons.search),
+            onPressed: () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => SearchPage()));
+            },
+          ),
+          padding: EdgeInsets.all(10),
+        ),
+        FloatingActionButton(
+          heroTag: "settingsFAB",
+          child: Icon(Icons.settings),
+          onPressed: () {
+            Fluttertoast.showToast(msg: "Hi!");
+          },
+        )
+      ]),
     );
   }
 }

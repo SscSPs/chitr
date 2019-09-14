@@ -102,19 +102,24 @@ class _SearchPageState extends State<SearchPage> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => ImagePage(model: hits[index]),
+                      builder: (context) => ImagePage(
+                        model: hits[index],
+                        heroTag: index.toString(),
+                      ),
                     ),
                   );
                 },
-                child: CachedNetworkImage(
-                  imageUrl: hits[index].webformatURL,
-                  fit: BoxFit.cover,
-                  placeholder: (context, value) {
-                    return Container(
-                      color: Colors.grey[800],
-                    );
-                  },
-                ),
+                child: Hero(
+                    tag: index.toString(),
+                    child: CachedNetworkImage(
+                      imageUrl: hits[index].webformatURL,
+                      fit: BoxFit.cover,
+                      placeholder: (context, value) {
+                        return Container(
+                          color: Colors.grey[800],
+                        );
+                      },
+                    )),
               );
             })
         : Center(
