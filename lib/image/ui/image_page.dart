@@ -248,9 +248,9 @@ class _ImagePageState extends State<ImagePage>
     try {
       final int result = await platform
           .invokeMethod('setWallpaper', [file.path, wallpaperType]);
-      print('Wallpaer Updated.... $result');
+      print('Wallpaper Updated.... $result');
     } on PlatformException catch (e) {
-      print("Failed to Set Wallpaer: '${e.message}'.");
+      print("Failed to Set Wallpaper: '${e.message}'.");
     }
     Fluttertoast.showToast(
         msg: "Wallpaper set successfully",
