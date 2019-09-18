@@ -26,37 +26,38 @@ class _SearchPageState extends State<SearchPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Theme.of(context).backgroundColor,
-        appBar: AppBar(
-          title: TextField(
-            controller: _searchController,
-            textInputAction: TextInputAction.search,
-            decoration: InputDecoration(
-              border: InputBorder.none,
-              hintText: 'Search',
-            ),
-            onSubmitted: (value) {
-              setState(() {
-                showSearchResult = true;
-              });
-              _saveSuggestions(value);
-              resetSearch();
-              _loadSearchImages(value);
-            },
+      backgroundColor: Theme.of(context).backgroundColor,
+      appBar: AppBar(
+        title: TextField(
+          controller: _searchController,
+          textInputAction: TextInputAction.search,
+          decoration: InputDecoration(
+            border: InputBorder.none,
+            hintText: 'Search',
           ),
-          actions: <Widget>[
-            IconButton(
-              icon: Icon(Icons.close),
-              onPressed: () {
-                _searchController.clear();
-                resetSearch();
-                showSearchResult = false;
-                setState(() {});
-              },
-            )
-          ],
+          onSubmitted: (value) {
+            setState(() {
+              showSearchResult = true;
+            });
+            _saveSuggestions(value);
+            resetSearch();
+            _loadSearchImages(value);
+          },
         ),
-        body: (showSearchResult) ? imagesGridList() : suggestionsWidget());
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.close),
+            onPressed: () {
+              _searchController.clear();
+              resetSearch();
+              showSearchResult = false;
+              setState(() {});
+            },
+          )
+        ],
+      ),
+      body: (showSearchResult) ? imagesGridList() : suggestionsWidget(),
+    );
   }
 
   suggestionsWidget() {
@@ -87,44 +88,55 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   imagesGridList() {
-    return (hits.length > 0)
-        ? GridView.builder(
-            controller: _gridController,
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              mainAxisSpacing: 4.0,
-              crossAxisSpacing: 4.0,
-            ),
-            itemCount: hits.length,
-            itemBuilder: (context, index) {
-              return GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => ImagePage(
-                        model: hits[index],
-                        heroTag: index.toString(),
-                      ),
-                    ),
-                  );
-                },
-                child: Hero(
-                    tag: index.toString(),
-                    child: CachedNetworkImage(
-                      imageUrl: hits[index].webformatURL,
-                      fit: BoxFit.cover,
-                      placeholder: (context, value) {
-                        return Container(
-                          color: Colors.grey[800],
-                        );
-                      },
-                    )),
-              );
-            })
-        : Center(
-            child: CircularProgressIndicator(),
-          );
+    if (hits.length <= 0) {
+      return Center(
+        child: CircularProgressIndicator(),
+      );
+    }
+    List<CachedNetworkImage> cniList = [];
+    for (Hits one in hits) {
+      cniList.add(
+        CachedNetworkImage(
+          imageUrl: one.webformatURL,
+          fit: one.imageHeight > one.imageWidth
+              ? BoxFit.fitWidth
+              : BoxFit.fitHeight,
+          placeholder: (context, value) {
+            return Container(
+              color: Colors.black,
+            );
+          },
+        ),
+      );
+    }
+
+    return GridView.builder(
+      controller: _gridController,
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+      ),
+      itemCount: hits.length,
+      itemBuilder: (context, index) {
+        return GestureDetector(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ImagePage(
+                  model: hits[index],
+                  heroTag: index.toString(),
+                  cachedNetworkImage: cniList[index],
+                ),
+              ),
+            );
+          },
+          child: Hero(
+            tag: index.toString(),
+            child: cniList[index],
+          ),
+        );
+      },
+    );
   }
 
   resetSearch() {

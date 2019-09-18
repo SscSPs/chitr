@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chitr/home/model/ImageModel.dart';
 import 'package:chitr/image/ui/image_page.dart';
 import 'package:chitr/search/searchPage.dart';
@@ -14,31 +15,32 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  static int initialXAxisElements = 5;
+  static int initialYAxisElements = 5;
+  static int initialElementsCount = initialYAxisElements * initialXAxisElements;
+  static bool majorAxisIsX = true;
+  List<CachedNetworkImage> imageWidgets = [];
   List<PreloadPageController> controllers = [];
   List<Hits> hits;
   var viewPortFractions = 0.7;
-  var initialOffset = 2;
+  static int majorAxisCount =
+      majorAxisIsX ? initialXAxisElements : initialYAxisElements;
+  static int minorAxisCount =
+      majorAxisIsX ? initialYAxisElements : initialXAxisElements;
+  static int majorOffset = (majorAxisCount / 2).floor();
+  static int minorOffset = (minorAxisCount / 2).floor();
 
   @override
   void initState() {
     _loadImages();
-    controllers = [
-      PreloadPageController(
-          viewportFraction: viewPortFractions, initialPage: initialOffset),
-      PreloadPageController(
-          viewportFraction: viewPortFractions, initialPage: initialOffset),
-      PreloadPageController(
-          viewportFraction: viewPortFractions, initialPage: initialOffset),
-      PreloadPageController(
-          viewportFraction: viewPortFractions, initialPage: initialOffset),
-      PreloadPageController(
-          viewportFraction: viewPortFractions, initialPage: initialOffset),
-    ];
+    for (int i = 0; i < minorAxisCount; i++)
+      controllers.add(PreloadPageController(
+          viewportFraction: viewPortFractions, initialPage: minorOffset));
     super.initState();
   }
 
   _animatePage(int page, int index) {
-    for (int i = 0; i < 5; i++) {
+    for (int i = 0; i < minorAxisCount; i++) {
       if (i != index) {
         controllers[i].animateToPage(page,
             duration: Duration(milliseconds: 300), curve: Curves.ease);
@@ -47,8 +49,22 @@ class _HomePageState extends State<HomePage> {
   }
 
   _loadImages() async {
-    var imageModel = await ApiProvider().getRandomImages(25);
+    var imageModel = await ApiProvider().getRandomImages(initialElementsCount);
     hits = imageModel.hits;
+    for (Hits one in hits) {
+      var temp;
+      if (one == null || one.webformatURL == null) {
+        temp = null;
+      } else {
+        temp = CachedNetworkImage(
+          imageUrl: one.webformatURL,
+          fit: one.imageHeight > one.imageWidth
+              ? BoxFit.fitWidth
+              : BoxFit.fitHeight,
+        );
+      }
+      imageWidgets.add(temp);
+    }
     setState(() {});
   }
 
@@ -59,22 +75,22 @@ class _HomePageState extends State<HomePage> {
       backgroundColor: Theme.of(context).backgroundColor,
       body: PreloadPageView.builder(
         controller: PreloadPageController(
-            viewportFraction: viewPortFractions, initialPage: initialOffset),
-        itemCount: 5,
-        preloadPagesCount: 5,
-        scrollDirection: Axis.vertical,
+            viewportFraction: viewPortFractions, initialPage: majorOffset),
+        itemCount: minorAxisCount,
+        preloadPagesCount: minorAxisCount,
+        scrollDirection: majorAxisIsX ? Axis.vertical : Axis.horizontal,
         itemBuilder: (context, mainIndex) {
           return PreloadPageView.builder(
-            itemCount: 5,
-            preloadPagesCount: 5,
+            itemCount: majorAxisCount,
+            preloadPagesCount: majorAxisCount,
             controller: controllers[mainIndex],
-            scrollDirection: Axis.horizontal,
+            scrollDirection: majorAxisIsX ? Axis.horizontal : Axis.vertical,
             physics: ClampingScrollPhysics(),
             onPageChanged: (page) {
               _animatePage(page, mainIndex);
             },
             itemBuilder: (context, index) {
-              var hitIndex = (mainIndex * 5) + index;
+              var hitIndex = (mainIndex * majorAxisCount) + index;
               var hit;
               if (hits != null) {
                 hit = hits[hitIndex];
@@ -88,44 +104,52 @@ class _HomePageState extends State<HomePage> {
                         builder: (context) => ImagePage(
                           heroTag: hitIndex.toString(),
                           model: hit,
-                          imageBoxFit: BoxFit.cover,
+                          cachedNetworkImage: _getImageWidget(hitIndex),
                         ),
                       ),
                     );
                   }
                 },
                 child: CustomCard(
-                  heroTag: hitIndex.toString(),
-                  title: hit?.user,
-                  description: hit?.tags,
-                  url: hit?.webformatURL,
-                ),
+                    heroTag: hitIndex.toString(),
+                    title: hit?.user,
+                    description: hit?.tags,
+                    cachedNetworkImageWidget: _getImageWidget(hitIndex)),
               );
             },
           );
         },
       ),
-      floatingActionButton:
-          Row(mainAxisAlignment: MainAxisAlignment.end, children: <Widget>[
-        Padding(
-          child: FloatingActionButton(
-            heroTag: "searchFAB",
-            child: Icon(Icons.search),
+      floatingActionButton: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: <Widget>[
+          Padding(
+            child: FloatingActionButton(
+              heroTag: "searchFAB",
+              child: Icon(Icons.search),
+              onPressed: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => SearchPage()));
+              },
+            ),
+            padding: EdgeInsets.all(10),
+          ),
+          FloatingActionButton(
+            heroTag: "settingsFAB",
+            child: Icon(Icons.settings),
             onPressed: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => SearchPage()));
+              Fluttertoast.showToast(msg: "Hi!");
             },
           ),
-          padding: EdgeInsets.all(10),
-        ),
-        FloatingActionButton(
-          heroTag: "settingsFAB",
-          child: Icon(Icons.settings),
-          onPressed: () {
-            Fluttertoast.showToast(msg: "Hi!");
-          },
-        )
-      ]),
+        ],
+      ),
     );
+  }
+
+  _getImageWidget(int hitIndex) {
+    if (hitIndex < imageWidgets.length) {
+      return imageWidgets[hitIndex];
+    }
+    return null;
   }
 }

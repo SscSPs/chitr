@@ -26,7 +26,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
         brightness: Brightness.dark,
-        backgroundColor: const Color(0xFF212121),
+        backgroundColor: const Color(0xFF000000),
         accentColor: Colors.white,
       ),
       home: ChangeNotifierProvider<BottomNavBarProvider>(
@@ -35,9 +35,9 @@ class MyApp extends StatelessWidget {
       ),
     );
   }
+
   checkInternet() {
-    final result = InternetAddress.lookup('google.com');
-    result.then((resp) {
+    InternetAddress.lookup('pixabay.com').then((resp) {
       Fluttertoast.showToast(msg: "Hi, You are Online!");
     }).catchError((e) {
       Fluttertoast.showToast(msg: "Hi, You seem to be Offline!");
@@ -55,6 +55,10 @@ class MainPage extends StatelessWidget {
   Widget build(BuildContext context) {
     var provider = Provider.of<BottomNavBarProvider>(context);
     return Scaffold(
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(0), // So we don't have a app bar
+        child: AppBar(),
+      ),
       extendBody: true,
       backgroundColor: Theme.of(context).backgroundColor,
       body: currentTab[provider.currentIndex],

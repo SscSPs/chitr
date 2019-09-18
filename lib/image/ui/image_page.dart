@@ -8,9 +8,9 @@ import 'package:share/share.dart';
 
 class ImagePage extends StatefulWidget {
   final Hits model;
-  final BoxFit imageBoxFit;
   final String heroTag;
-  ImagePage({this.model, this.heroTag, this.imageBoxFit});
+  final CachedNetworkImage cachedNetworkImage;
+  ImagePage({this.model, this.heroTag, this.cachedNetworkImage});
 
   @override
   _ImagePageState createState() => _ImagePageState();
@@ -51,10 +51,7 @@ class _ImagePageState extends State<ImagePage>
                         _controller.forward();
                       }
                     },
-                    child: CachedNetworkImage(
-                      imageUrl: widget.model.largeImageURL,
-                      fit: widget.imageBoxFit,
-                    ),
+                    child: widget.cachedNetworkImage,
                   ),
                 ),
                 Container(

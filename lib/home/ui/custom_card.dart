@@ -1,15 +1,14 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 class CustomCard extends StatefulWidget {
   CustomCard({
     @required this.heroTag,
-    @required this.url,
+    @required this.cachedNetworkImageWidget,
     @required this.title,
     @required this.description,
   });
 
-  final String url;
+  final Widget cachedNetworkImageWidget;
   final String heroTag;
   final String title;
   final String description;
@@ -23,17 +22,15 @@ class _CustomCardState extends State<CustomCard> {
   Widget build(BuildContext context) {
     return Hero(
       child: Card(
+        color: Theme.of(context).backgroundColor,
         clipBehavior: Clip.antiAlias,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4.0)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(4.0),
+        ),
         child: Stack(
           children: <Widget>[
             Container(
-              child: (widget.url != null)
-                  ? CachedNetworkImage(
-                      imageUrl: widget.url,
-                      fit: BoxFit.cover,
-                    )
-                  : null,
+              child: widget.cachedNetworkImageWidget,
               width: double.infinity,
               height: double.infinity,
             ),
@@ -56,8 +53,10 @@ class _CustomCardState extends State<CustomCard> {
                 children: <Widget>[
                   Text(
                     (widget.title != null) ? widget.title : '',
-                    style:
-                        TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontSize: 20.0,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   Padding(
                     padding: const EdgeInsets.all(8.0),

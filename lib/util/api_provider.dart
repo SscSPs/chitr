@@ -6,8 +6,11 @@ import 'package:http/http.dart' as http;
 
 class ApiProvider {
   Future<ImageModel> getRandomImages(int count) async {
-    final response = await http.get(
-        '${apiUrl}editors_choice=true&per_page=$count&orientation=vertical');
+    var url =
+        '${apiUrl}editors_choice=true&per_page=$count&orientation=vertical';
+    final response = await http.get(url);
+    print(url);
+    print("BODY : " + response.body);
     if (response.statusCode == 200) {
       return ImageModel.fromJson(jsonDecode(response.body));
     } else {
@@ -16,7 +19,7 @@ class ApiProvider {
   }
 
   Future<ImageModel> getSearchedImages(String query, int page) async {
-    final response = await http.get('${apiUrl}q=$query&page=$page');
+    final response = await http.get('${apiUrl}q=$query&page=$page&orientation=vertical');
     if (response.statusCode == 200) {
       return ImageModel.fromJson(jsonDecode(response.body));
     } else {
