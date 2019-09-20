@@ -10,6 +10,10 @@ import 'package:preload_page_view/preload_page_view.dart';
 import 'custom_card.dart';
 
 class HomePage extends StatefulWidget {
+  final Function() onSettingsPressed;
+
+  HomePage({this.onSettingsPressed});
+
   @override
   _HomePageState createState() => _HomePageState();
 }
@@ -120,7 +124,7 @@ class _HomePageState extends State<HomePage> {
           );
         },
       ),
-      floatingActionButton: Row(
+      floatingActionButton: Column(
         mainAxisAlignment: MainAxisAlignment.end,
         children: <Widget>[
           Padding(
@@ -134,13 +138,17 @@ class _HomePageState extends State<HomePage> {
             ),
             padding: EdgeInsets.all(10),
           ),
-          FloatingActionButton(
-            heroTag: "settingsFAB",
-            child: Icon(Icons.settings),
-            onPressed: () {
-              Fluttertoast.showToast(msg: "Hi!");
-            },
-          ),
+          Padding(
+            child: FloatingActionButton(
+              heroTag: "settingsFAB",
+              child: Icon(Icons.refresh),
+              onPressed: () {
+                widget.onSettingsPressed();
+                Fluttertoast.showToast(msg: "Hi!");
+              },
+            ),
+            padding: EdgeInsets.all(10),
+          )
         ],
       ),
     );
