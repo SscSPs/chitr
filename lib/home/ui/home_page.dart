@@ -26,7 +26,8 @@ class _HomePageState extends State<HomePage> {
   List<CachedNetworkImage> imageWidgets = [];
   List<PreloadPageController> controllers = [];
   List<Hits> hits;
-  var viewPortFractions = 0.7;
+  var majorAxisViewPortFractions = 0.8;
+  var minorAxisViewPortFractions = 0.6;
   static int majorAxisCount =
       majorAxisIsX ? initialXAxisElements : initialYAxisElements;
   static int minorAxisCount =
@@ -39,7 +40,7 @@ class _HomePageState extends State<HomePage> {
     _loadImages();
     for (int i = 0; i < minorAxisCount; i++)
       controllers.add(PreloadPageController(
-          viewportFraction: viewPortFractions, initialPage: minorOffset));
+          viewportFraction: majorAxisViewPortFractions, initialPage: minorOffset));
     super.initState();
   }
 
@@ -79,7 +80,7 @@ class _HomePageState extends State<HomePage> {
       backgroundColor: Theme.of(context).backgroundColor,
       body: PreloadPageView.builder(
         controller: PreloadPageController(
-            viewportFraction: viewPortFractions, initialPage: majorOffset),
+            viewportFraction: minorAxisViewPortFractions, initialPage: majorOffset),
         itemCount: minorAxisCount,
         preloadPagesCount: minorAxisCount,
         scrollDirection: majorAxisIsX ? Axis.vertical : Axis.horizontal,
