@@ -46,13 +46,13 @@ class _MyApp extends State<MyApp> {
       home: ChangeNotifierProvider<BottomNavBarProvider>(
         builder: (context) => BottomNavBarProvider(),
         child: MainPage(
-            currentPage:
-                isInternetAvailable != null && isInternetAvailable
-                    ? HomePage(onSettingsPressed: checkInternet)
-                    : FallBackPage(
-                        onPress: checkInternet,
-                        internetAvailable: isInternetAvailable,
-                      )),
+          currentPage: isInternetAvailable != null && isInternetAvailable
+              ? HomePage(onSettingsPressed: checkInternet)
+              : FallBackPage(
+                  onPress: checkInternet,
+                  internetAvailable: isInternetAvailable,
+                ),
+        ),
       ),
     );
   }

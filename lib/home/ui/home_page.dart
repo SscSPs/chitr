@@ -4,6 +4,7 @@ import 'package:chitr/image/ui/image_page.dart';
 import 'package:chitr/search/searchPage.dart';
 import 'package:chitr/util/api_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:preload_page_view/preload_page_view.dart';
 
@@ -21,13 +22,9 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   static int initialXAxisElements = 5;
   static int initialYAxisElements = 5;
-  static int initialElementsCount = initialYAxisElements * initialXAxisElements;
+  static double majorAxisViewPortFractions = 0.8;
+  static double minorAxisViewPortFractions = 0.7;
   static bool majorAxisIsX = true;
-  List<CachedNetworkImage> imageWidgets = [];
-  List<PreloadPageController> controllers = [];
-  List<Hits> hits;
-  var majorAxisViewPortFractions = 0.8;
-  var minorAxisViewPortFractions = 0.6;
   static int majorAxisCount =
       majorAxisIsX ? initialXAxisElements : initialYAxisElements;
   static int minorAxisCount =
@@ -35,20 +32,30 @@ class _HomePageState extends State<HomePage> {
   static int majorOffset = (majorAxisCount / 2).floor();
   static int minorOffset = (minorAxisCount / 2).floor();
 
+  static int initialElementsCount = majorAxisCount * minorAxisCount;
+  List<CachedNetworkImage> imageWidgets = [];
+  List<PreloadPageController> controllers = [];
+  List<Hits> hits;
+
   @override
   void initState() {
     _loadImages();
     for (int i = 0; i < minorAxisCount; i++)
       controllers.add(PreloadPageController(
-          viewportFraction: majorAxisViewPortFractions, initialPage: minorOffset));
+        viewportFraction: majorAxisViewPortFractions,
+        initialPage: minorOffset,
+      ));
     super.initState();
   }
 
   _animatePage(int page, int index) {
     for (int i = 0; i < minorAxisCount; i++) {
       if (i != index) {
-        controllers[i].animateToPage(page,
-            duration: Duration(milliseconds: 300), curve: Curves.ease);
+        controllers[i].animateToPage(
+          page,
+          duration: Duration(milliseconds: 300),
+          curve: Curves.ease,
+        );
       }
     }
   }
@@ -63,9 +70,7 @@ class _HomePageState extends State<HomePage> {
       } else {
         temp = CachedNetworkImage(
           imageUrl: one.webformatURL,
-          fit: one.imageHeight > one.imageWidth
-              ? BoxFit.fitWidth
-              : BoxFit.fitHeight,
+          fit: BoxFit.cover,
         );
       }
       imageWidgets.add(temp);
@@ -80,7 +85,9 @@ class _HomePageState extends State<HomePage> {
       backgroundColor: Theme.of(context).backgroundColor,
       body: PreloadPageView.builder(
         controller: PreloadPageController(
-            viewportFraction: minorAxisViewPortFractions, initialPage: majorOffset),
+          viewportFraction: minorAxisViewPortFractions,
+          initialPage: majorOffset,
+        ),
         itemCount: minorAxisCount,
         preloadPagesCount: minorAxisCount,
         scrollDirection: majorAxisIsX ? Axis.vertical : Axis.horizontal,
@@ -116,10 +123,11 @@ class _HomePageState extends State<HomePage> {
                   }
                 },
                 child: CustomCard(
-                    heroTag: hitIndex.toString(),
-                    title: hit?.user,
-                    description: hit?.tags,
-                    cachedNetworkImageWidget: _getImageWidget(hitIndex)),
+                  heroTag: hitIndex.toString(),
+                  title: hit?.user,
+                  description: hit?.tags,
+                  cachedNetworkImageWidget: _getImageWidget(hitIndex),
+                ),
               );
             },
           );
@@ -133,8 +141,12 @@ class _HomePageState extends State<HomePage> {
               heroTag: "searchFAB",
               child: Icon(Icons.search),
               onPressed: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => SearchPage()));
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => SearchPage(),
+                  ),
+                );
               },
             ),
             padding: EdgeInsets.all(10),
@@ -149,7 +161,7 @@ class _HomePageState extends State<HomePage> {
               },
             ),
             padding: EdgeInsets.all(10),
-          )
+          ),
         ],
       ),
     );
