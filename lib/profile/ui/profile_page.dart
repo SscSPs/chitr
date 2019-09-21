@@ -14,12 +14,14 @@ class FallBackPage extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: internetAvailable == null
-              ? Text("Checkoing Your Internet connection")
+              ? <Widget>[
+                  Text("Checking Your Internet connection"),
+                ]
               : <Widget>[
                   Text('Seems Like You are Offline'),
                   Text('Press the Button To Retry'),
-                  RaisedButton(
-                    onPressed: onPress(),
+                  MaterialButton(
+                    onPressed: onPress,
                     color: Theme.of(context).primaryColor,
                     child: Icon(Icons.refresh),
                   ),
