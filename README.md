@@ -2,8 +2,8 @@
 <img src="https://github.com/divyanshub024/chitr/blob/master/art/banner.png"/>
 
 Chitr is a Wallpapers and Backgrounds app.
- - Find all your wallpapers and backgrounds in one place.
- - Easily set any image as a wallpaper.
+ - Find all your wallpapers and backgrounds at one place.
+ - Easily set any image as wallpaper.
  - Choose between variety of wallpapers.
  - Share your favourite images with your friends.
  - Get more than 1 million stunning images from Pixabay.
@@ -30,7 +30,7 @@ You may obtain a copy of the License at
 
    http://www.apache.org/licenses/LICENSE-2.0
 
-Unless required by applicable law or agreed to in writing, software
+Unless required by the applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
